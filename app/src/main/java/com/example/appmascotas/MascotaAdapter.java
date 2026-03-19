@@ -90,7 +90,7 @@ public class MascotaAdapter extends RecyclerView.Adapter<MascotaAdapter.ViewHold
     }
 
     //4. Eliminar un elemento de la lista<mascota>
-    public void eliminar(int position){
+    public void eliminarItem(int position){
         lista.remove(position);
         notifyItemRemoved(position);
     }

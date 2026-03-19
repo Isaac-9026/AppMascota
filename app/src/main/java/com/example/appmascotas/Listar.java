@@ -30,7 +30,7 @@ public class Listar extends AppCompatActivity {
     ListView lstMascotas;
     RequestQueue requestQueue;
 
-    private final String URL = "http://192.168.101.63:3000/mascotas/";
+    private final String URL = "http://192.168.101.60:3000/mascotas/";
 
     private void loadUI(){
         lstMascotas = findViewById(R.id.lstMascotas);
