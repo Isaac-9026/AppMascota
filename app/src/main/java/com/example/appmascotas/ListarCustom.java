@@ -2,6 +2,8 @@ package com.example.appmascotas;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -30,7 +32,7 @@ public class ListarCustom extends AppCompatActivity implements MascotaAdapter.On
     RequestQueue requestQueue;
 
 
-    private final String URL = "http://192.168.101.60:3000/mascotas/";
+    private final String URL = "http://192.168.18.217:3000/mascotas/";
 
     private void loadUI() {
         recyclerMascotas = findViewById(R.id.recyclerMascotas);
@@ -104,8 +106,59 @@ public class ListarCustom extends AppCompatActivity implements MascotaAdapter.On
 
     @Override
     public void onEditar(int position, Mascota mascota) {
-        Toast.makeText(this, "Editar: "+ mascota.getNombre(), Toast.LENGTH_SHORT).show();
+        editarMascota(mascota);
+    }
 
+    private void editarMascota(Mascota mascota) {
+        View viewDialog = getLayoutInflater()
+                .inflate(R.layout.activity_editar, null);
+
+        EditText edtTipo   = viewDialog.findViewById(R.id.edtTipo);
+        EditText edtNombre = viewDialog.findViewById(R.id.edtNombre);
+        EditText edtColor  = viewDialog.findViewById(R.id.edtColor);
+        EditText edtPeso   = viewDialog.findViewById(R.id.edtPeso);
+
+        edtTipo.setText(mascota.getTipo());
+        edtNombre.setText(mascota.getNombre());
+        edtColor.setText(mascota.getColor());
+        edtPeso.setText(String.valueOf(mascota.getPesokg()));
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Editar mascota");
+        builder.setView(viewDialog);
+
+        builder.setPositiveButton("Guardar", (dialog, which) -> {
+            try {
+                JSONObject body = new JSONObject();
+                body.put("tipo",   edtTipo.getText().toString());
+                body.put("nombre", edtNombre.getText().toString());
+                body.put("color",  edtColor.getText().toString());
+                body.put("pesokg", Double.parseDouble(edtPeso.getText().toString()));
+
+                String urlEditar = this.URL + mascota.getId();
+
+                JsonObjectRequest putRequest = new JsonObjectRequest(
+                        Request.Method.PUT,
+                        urlEditar,
+                        body,
+                        response -> {
+                            Toast.makeText(this, "Mascota actualizada", Toast.LENGTH_SHORT).show();
+                            obtenerDatos();
+                        },
+                        error -> {
+                            Log.e("ErrorPUT", error.toString());
+                            Toast.makeText(this, "Error al actualizar", Toast.LENGTH_SHORT).show();
+                        }
+                );
+                requestQueue.add(putRequest);
+
+            } catch (Exception e) {
+                Log.e("ErrorJSON", e.toString());
+            }
+        });
+
+        builder.setNegativeButton("Cancelar", null);
+        builder.create().show();
     }
 
     @Override
